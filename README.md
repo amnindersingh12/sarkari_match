@@ -28,6 +28,9 @@ Checking eligibility for government jobs is painful:
 - **🔗 Direct Links**: Skip the middleman - get direct links to official application portals
 
 ## 📸 Screenshot
+![SarkariMatch Homepage](screenshots/homepage.png)
+
+*Homepage with input form for user details*
 
 ![SarkariMatch Dashboard](screenshots/dashboard.png)
 
