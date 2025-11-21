@@ -1,25 +1,32 @@
+```python
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import json
 from datetime import date, datetime
-import logging
+import os
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-app = FastAPI(title="SarkariMatch")
+app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 # Load jobs from JSON
 def load_jobs():
+    """Load jobs from jobs.json, create empty file if doesn't exist"""
+    if not os.path.exists("jobs.json"):
+        print("⚠️ jobs.json not found, creating empty file...")
+        with open("jobs.json", "w") as f:
+            json.dump([], f)
+        return []
+    
     try:
         with open("jobs.json", "r") as f:
             return json.load(f)
-    except FileNotFoundError:
-        logger.warning("jobs.json not found. Run scraper.py first.")
+    except Exception as e:
+        print(f"Error loading jobs.json: {e}")
+        return []
+    except FileNotFoundError: # This block might not be reached if Exception catches it first
+        print("jobs.json not found. Run scraper.py first.") # Changed from logger.warning to print as logging config was removed
         return []
 
 @app.get("/", response_class=HTMLResponse)
