@@ -146,6 +146,4 @@ cython_debug/
 # Project specific
 jobs.json
 debug_scraper.py
-*.webp
-*.png
 .gemini/

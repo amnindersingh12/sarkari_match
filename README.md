@@ -27,6 +27,12 @@ Checking eligibility for government jobs is painful:
 - **🎨 Clean Dashboard UI**: See vacancy count, age limits, and action buttons at a glance
 - **🔗 Direct Links**: Skip the middleman - get direct links to official application portals
 
+## 📸 Screenshot
+
+![SarkariMatch Dashboard](screenshots/dashboard.png)
+
+*Clean dashboard showing eligible jobs with vacancy badges, key stats, and direct apply buttons*
+
 ## 🚀 Quick Start
 
 ### Prerequisites
