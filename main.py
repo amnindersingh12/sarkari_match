@@ -1,4 +1,3 @@
-```python
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -7,7 +6,7 @@ import json
 from datetime import date, datetime
 import os
 
-app = FastAPI()
+app = FastAPI(title="SarkariMatch")
 templates = Jinja2Templates(directory="templates")
 
 # Load jobs from JSON
@@ -24,9 +23,6 @@ def load_jobs():
             return json.load(f)
     except Exception as e:
         print(f"Error loading jobs.json: {e}")
-        return []
-    except FileNotFoundError: # This block might not be reached if Exception catches it first
-        print("jobs.json not found. Run scraper.py first.") # Changed from logger.warning to print as logging config was removed
         return []
 
 @app.get("/", response_class=HTMLResponse)
@@ -61,11 +57,6 @@ async def match_jobs(
         is_age_eligible = user_age <= effective_max_age
         
         # 2. Qualification Check
-        # Check if selected qualification is in job's list OR job allows ANY_DEGREE
-        # Also, higher degrees typically imply lower ones, but for strict matching we check list.
-        # User selection: 10th, 12th, Graduate, B.Tech, Post Graduate
-        # Job tags: 10TH, 12TH, GRADUATE, B.TECH, POST GRADUATE, ANY_DEGREE
-        
         user_qual_map = {
             "10th": "10TH",
             "12th": "12TH",
@@ -76,25 +67,18 @@ async def match_jobs(
         
         user_q_tag = user_qual_map.get(qualification, "")
         
-        # Logic: If user has B.TECH, they are also GRADUATE, 12TH, 10TH.
-        # We need a hierarchy.
-        hierarchy = ["10TH", "12TH", "GRADUATE", "B.TECH", "POST GRADUATE"]
-        # Note: B.TECH is a type of GRADUATE, but for this simple logic let's treat them as tags.
-        # If job requires 10TH, and user is B.TECH, they are eligible.
-        
-        # Let's simplify: Check if job requirement is present in user's "implied" qualifications.
+        # Build user's implied qualifications
         user_implied_quals = set()
         if user_q_tag == "10TH": user_implied_quals.update(["10TH"])
         elif user_q_tag == "12TH": user_implied_quals.update(["10TH", "12TH"])
         elif user_q_tag == "GRADUATE": user_implied_quals.update(["10TH", "12TH", "GRADUATE"])
         elif user_q_tag == "B.TECH": user_implied_quals.update(["10TH", "12TH", "GRADUATE", "B.TECH"])
-        elif user_q_tag == "POST GRADUATE": user_implied_quals.update(["10TH", "12TH", "GRADUATE", "B.TECH", "POST GRADUATE"]) # Assuming PG implies others for simplicity
+        elif user_q_tag == "POST GRADUATE": user_implied_quals.update(["10TH", "12TH", "GRADUATE", "B.TECH", "POST GRADUATE"])
         
         is_qual_eligible = False
         if "ANY_DEGREE" in job["qualification"]:
             is_qual_eligible = True
         else:
-            # Check if ANY of the job's requirements match the user's implied quals
             for req in job["qualification"]:
                 if req in user_implied_quals:
                     is_qual_eligible = True
